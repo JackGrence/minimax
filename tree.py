@@ -2,10 +2,10 @@ import queue
 
 
 class tree:
-    def __init__(self, branch, leaf_len, leaf):
+    def __init__(self, branch, max_depth, leaf):
         self.__branch = branch
-        self.__leaf_len = leaf_len
-        self.__leaf = leaf[:leaf_len]
+        self.__leaf_len = branch ** max_depth
+        self.__leaf = leaf[:]
         self.__max = leaf[0]
         self.__min = leaf[0]
         for i in leaf[1:]:
@@ -15,14 +15,27 @@ class tree:
                 self.__min = i
         self.__max += 1
         self.__min -= 1
-        self.__max_depth = 0
+        self.__max_depth = max_depth
         self.__cur_index = 0
         self.pruning_node = []
         self.root = self.node(self.__min, 0, None, self.__branch)
-        self.build_tree(self.root, 0, False, branch)
+        self.build_tree(self.root, 0, False)
         self.alpha_beta_pruning(self.root, 0, True, self.__min, self.__max)
         #self.minimax(self.root, 0, True)
         # catch leaf_len < 1 or leaf is empty
+
+    def get_pruning_leaf(self):
+        leaf = []
+        for i in self.pruning_node:
+            self.get_leaf(i, leaf)
+        return leaf
+
+    def get_leaf(self, cur_node, leaf):
+        if cur_node.depth == self.__max_depth:
+            leaf.append(cur_node.value)
+            return
+        for i in cur_node.child:
+            self.get_leaf(i, leaf)
 
     def print(self, print_node):
         last_node_depth = -1
@@ -38,18 +51,16 @@ class tree:
             last_node_depth = cur_node.depth
         print('')
 
-    def build_tree(self, cur_node, depth, is_max, node_len):
-        if depth + 1 > self.__max_depth:
-            self.__max_depth = depth + 1
+    def build_tree(self, cur_node, depth, is_max):
         for i in range(self.__branch):
             value = self.__min if is_max else self.__max
             new_node = self.node(value, depth + 1, cur_node, self.__branch)
             cur_node.child.append(new_node)
-            if node_len == self.__leaf_len:
+            if depth + 1 == self.__max_depth:
                 new_node.value = self.__leaf[self.__cur_index]
                 self.__cur_index += 1
             else:
-                self.build_tree(new_node, depth + 1, not is_max, node_len * self.__branch)
+                self.build_tree(new_node, depth + 1, not is_max)
 
     def minimax(self, cur_node, depth, is_max):
         if depth >= self.__max_depth:
