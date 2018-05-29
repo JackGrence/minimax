@@ -21,7 +21,7 @@ class tree:
         self.root = self.node(self.__min, 0, None, self.__branch)
         self.build_tree(self.root, 0, False)
         self.alpha_beta_pruning(self.root, 0, True, self.__min, self.__max)
-        #self.minimax(self.root, 0, True)
+        # self.minimax(self.root, 0, True)
         # catch leaf_len < 1 or leaf is empty
 
     def get_pruning_leaf(self):
@@ -69,9 +69,11 @@ class tree:
         for i in cur_node.child:
             value = self.minimax(i, depth + 1, not is_max)
             if is_max:
-                cur_node.value = value if value > cur_node.value else cur_node.value
+                if value > cur_node.value:
+                    cur_node.value = value
             else:
-                cur_node.value = value if value < cur_node.value else cur_node.value
+                if value < cur_node.value:
+                    cur_node.value = value
             child_index += 1
         return cur_node.value
 
@@ -80,17 +82,22 @@ class tree:
             return cur_node.value
         child_index = 0
         for i in cur_node.child:
-            value = self.alpha_beta_pruning(i, depth + 1, not is_max, alpha, beta)
+            value = self.alpha_beta_pruning(i, depth + 1,
+                                            not is_max, alpha, beta)
             if is_max:
                 # get maximizing of child
-                cur_node.value = value if value > cur_node.value else cur_node.value
+                if value > cur_node.value:
+                    cur_node.value = value
                 # update alpha
-                alpha = cur_node.value if cur_node.value > alpha else alpha
+                if cur_node.value > alpha:
+                    alpha = cur_node.value
             else:
                 # get minimizing of child
-                cur_node.value = value if value < cur_node.value else cur_node.value
+                if value < cur_node.value:
+                    cur_node.value = value
                 # update beta
-                beta = cur_node.value if cur_node.value < beta else beta
+                if cur_node.value < beta:
+                    beta = cur_node.value
             # record pruning index
             child_index += 1
 
