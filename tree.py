@@ -20,7 +20,8 @@ class tree:
         self.pruning_node = []
         self.root = self.node(self.__min, 0, None, self.__branch)
         self.build_tree(self.root, 0, False, branch)
-        self.minimax(self.root, 0, True)
+        self.alpha_beta_pruning(self.root, 0, True, self.__min, self.__max)
+        #self.minimax(self.root, 0, True)
         # catch leaf_len < 1 or leaf is empty
 
     def print(self, print_node):
@@ -55,23 +56,37 @@ class tree:
             return cur_node.value
         child_index = 0
         for i in cur_node.child:
-            # alpha-beta pruning
-            if depth >= 1:
-                if is_max:
-                    alpha = cur_node.value
-                    beta = cur_node.parent.value
-                else:
-                    alpha = cur_node.parent.value
-                    beta = cur_node.value
-                if alpha >= beta:
-                    self.pruning_node.extend(cur_node.child[child_index:])
-                    break
             value = self.minimax(i, depth + 1, not is_max)
             if is_max:
                 cur_node.value = value if value > cur_node.value else cur_node.value
             else:
                 cur_node.value = value if value < cur_node.value else cur_node.value
             child_index += 1
+        return cur_node.value
+
+    def alpha_beta_pruning(self, cur_node, depth, is_max, alpha, beta):
+        if depth >= self.__max_depth:
+            return cur_node.value
+        child_index = 0
+        for i in cur_node.child:
+            value = self.alpha_beta_pruning(i, depth + 1, not is_max, alpha, beta)
+            if is_max:
+                # get maximizing of child
+                cur_node.value = value if value > cur_node.value else cur_node.value
+                # update alpha
+                alpha = cur_node.value if cur_node.value > alpha else alpha
+            else:
+                # get minimizing of child
+                cur_node.value = value if value < cur_node.value else cur_node.value
+                # update beta
+                beta = cur_node.value if cur_node.value < beta else beta
+            # record pruning index
+            child_index += 1
+
+            # alpha-beta pruning
+            if alpha >= beta:
+                self.pruning_node.extend(cur_node.child[child_index:])
+                break
         return cur_node.value
 
     class node:
