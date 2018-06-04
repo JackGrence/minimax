@@ -8,6 +8,7 @@ class tree:
         self.__leaf = leaf[:]
         self.__max = leaf[0]
         self.__min = leaf[0]
+        self.ta = []
         for i in leaf[1:]:
             if self.__max < i:
                 self.__max = i
@@ -79,7 +80,9 @@ class tree:
 
     def alpha_beta_pruning(self, cur_node, depth, is_max, alpha, beta):
         if depth >= self.__max_depth:
-            return cur_node.value
+            val = cur_node.value
+            self.ta.append(val)
+            return val
         child_index = 0
         for i in cur_node.child:
             value = self.alpha_beta_pruning(i, depth + 1,
