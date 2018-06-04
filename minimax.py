@@ -14,6 +14,7 @@ def main():
     print('pruning leaf len:', len(pruning_leaf))
     print('leaf:')
     print(pruning_leaf)
+    print(t.ta)
 
 
 def get_tree_info():
@@ -22,7 +23,7 @@ def get_tree_info():
         branch = int(f.readline())
         max_depth = int(f.readline())
         leaf = f.readline()
-    leaf = [int(i) for i in leaf.split(', ')]
+    leaf = [int(i) for i in leaf.split(',')]
     return branch, max_depth, leaf
 
 
